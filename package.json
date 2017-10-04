@@ -1,5 +1,6 @@
 {
   "name": "svc-rpc",
+  "description": "Minimal service-to-service json-rpc framework, based on micro",
   "version": "0.1.0",
   "main": "index.js",
   "license": "MIT",

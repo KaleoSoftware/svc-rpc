@@ -91,6 +91,49 @@ const {error} = rpc('localhost:3000', 'exampleWithParams', {name: 123})
 console.log(error) // "{code: -32602, message: 'Invalid params', data: {name: 'Expected string instead of number'}}", or something like that
 ```
 
+### Extra schemas
+
+If you want to have an extra, re-usable schema you can make `$ref`s to, just add the schema to the rpc directory with the `.schema.js` extension:
+
+rpc/_user.schema.json
+
+```js
+module.exports = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    id: {
+      type: 'number'
+    },
+    username: {
+      type: 'string'
+    }
+  }
+}
+```
+
+And then you can add refs to it in other rpcs:
+
+rpc/insertUser.js
+
+```
+module.exports = async () => {/*...*/}
+module.exports.paramsSchema = {
+  type: 'object',
+  allOf: [
+    {$ref: '_user'},
+    {
+      properties: {
+        time: {
+          type: 'string',
+
+        }
+      }
+    }
+  ]
+}
+```
+
 ### Custom errors
 
 If you want to create your own errors, you can use the `addError()` function, which gets the same parameters as [tv4](https://github.com/geraintluff/tv4)'s `setErrorReporter()` function.
@@ -127,7 +170,7 @@ module.exports = compose(
 )(async (req, res) => send(res, 404))
 ```
 
-### addJwt()
+### JWT authentication
 
 A helper HoF, `addJwt()`, is available if you want to add the jwt from cookies.jwt or authorization header to the `req` object, as `req.jwt`. This is useful for authenticating. An alternative is [micro-jwt-auth](https://github.com/kandros/micro-jwt-auth), which blocks requests with a 401 if the jwt isn't correct.
 
@@ -154,7 +197,7 @@ const {result, error} = rpc('localhost:3000', 'myFunction', {parameterHere: 'hey
 console.log(result, error)
 ```
 
-### jwtRpc
+### Authenticated RPCs
 
 If you want to make a call with a jwt, you can use jwtRpc(url, method, parameters, reqOrJwt)
 
@@ -192,7 +235,7 @@ MyPage.getInitialProps(({req}) => {
 
 ```
 
-### svcRpc
+### Service-to-service rpcs
 
 If you follow our convention, and put service urls in environment variables like so:
 
@@ -247,5 +290,5 @@ it('should do something', async () => {
 
 ## Authors
 
-John Lynch - [johnthethird](https://github.com/johnthethird)
-Tucker Connelly - [tuckerconnelly](https://github.com/tuckerconnelly)
+- John Lynch - [johnthethird](https://github.com/johnthethird)
+- Tucker Connelly - [tuckerconnelly](https://github.com/tuckerconnelly)
