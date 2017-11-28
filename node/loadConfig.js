@@ -4,6 +4,10 @@ const dotenv = require('dotenv')
 const _ = require('lodash')
 const jsome = require('jsome')
 
+if (!fs.existsSync('.env')) {
+  throw new Error('.env file missing!')
+}
+
 const envExample = dotenv.parse(fs.readFileSync('.env.example'))
 const env = dotenv.parse(fs.readFileSync('.env'))
 
