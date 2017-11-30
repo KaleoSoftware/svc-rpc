@@ -131,6 +131,33 @@ function handleRpcs (rpcDir, {dontDefault} = {dontDefault: []}) {
     {}
   )
 
+  // Also add support for directories with an index.js
+  const isDir = source => fs.lstatSync(source).isDirectory()
+  const dirs = fs.readdirSync(rpcDir).filter(name => isDir(path.join(rpcDir, name)))
+  dirs.reduce(
+    (dirMethods, dirname) => {
+      const fqn = path.join(rpcDir, dirname, 'index.js')
+      try {
+        fs.accessSync(fqn)
+      } catch (err) {
+        return dirMethods
+      }
+
+      const name = dirname
+      const module = require(fqn)
+      if (!module.paramsSchema) {
+        throw new Error(`paramsSchema not exported from ${dirname}/index.js`)
+      }
+      dirMethods[name] = module
+      tv4.addSchema(name, module.paramsSchema)
+
+      return dirMethods
+    },
+    methods
+  )
+  console.log('Loaded RPC methods:', Object.keys(methods).sort())
+
+
   return fn =>
     async (req, res, ...args) => {
       // Assume if the content type is application/json, that it's an rpc request
