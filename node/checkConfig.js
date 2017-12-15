@@ -9,18 +9,12 @@ if (!fs.existsSync('.env')) {
 }
 
 const envExample = dotenv.parse(fs.readFileSync('.env.example'))
-const env = dotenv.parse(fs.readFileSync('.env'))
 
-const difference = _.difference(Object.keys(envExample), Object.keys(env))
+const difference = _.difference(Object.keys(envExample), Object.keys(process.env))
 
 if (difference.length !== 0) {
   throw new Error(`You're missing an env var in .env that's set in .env.example: ${JSON.stringify(difference)}`)
 }
-
-Object.keys(env).forEach(key => {
-  if (process.env.hasOwnProperty(key)) return
-  process.env[key] = env[key]
-})
 
 const cleanConfig = _(process.env)
   .pickBy((_, key) => !/^npm_/.test(key)) // Removes npm_* vars
