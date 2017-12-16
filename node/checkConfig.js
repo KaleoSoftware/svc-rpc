@@ -13,7 +13,7 @@ const envExample = dotenv.parse(fs.readFileSync('.env.example'))
 const difference = _.difference(Object.keys(envExample), Object.keys(process.env))
 
 if (difference.length !== 0) {
-  throw new Error(`You're missing an env var in .env that's set in .env.example: ${JSON.stringify(difference)}`)
+  throw new Error(`You're missing an env var that's set in .env.example: ${JSON.stringify(difference)}`)
 }
 
 const cleanConfig = _(process.env)
