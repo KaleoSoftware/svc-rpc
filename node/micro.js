@@ -7,11 +7,10 @@ const {json} = require('micro')
 const serializeError = require('serialize-error')
 const tv4 = require('tv4')
 const {get, set} = require('lodash')
+const jsonwebtoken = require('jsonwebtoken')
 
 const requestSchema = require('./request.schema')
 const addError = require('./addError')
-
-const jsonwebtoken = require('jsonwebtoken')
 
 function addJwt (secret) {
   return fn =>
@@ -155,7 +154,10 @@ function handleRpcs (rpcDir, {dontDefault} = {dontDefault: []}) {
     },
     methods
   )
-  console.log('Loaded RPC methods:', Object.keys(methods).sort())
+  console.log({
+    message: 'Loaded RPC methods',
+    methods: Object.keys(methods).sort()
+  })
 
 
   return fn =>
@@ -229,7 +231,10 @@ function handleRpcs (rpcDir, {dontDefault} = {dontDefault: []}) {
         if (
           !(err instanceof RpcError) && process.env.NODE_ENV === 'production'
         ) {
-          console.error('Error occured in RPC function', err)
+          console.error({
+            message: 'Error occured in RPC function',
+            error: serializeError(err)
+          })
         }
 
         // Send the full error in dev mode for easier debugging
